@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { getPokemonList } from '../services/pokemon';
 
-const pokemons = await getPokemonList()
+const { list } = await getPokemonList()
 ---
 
 <Layout title="Pokedex">
@@ -20,7 +20,7 @@ const pokemons = await getPokemonList()
 				<span class="text-lg text-white font-extrabold w-1/3 text-center">Name</span>
 				<span class="text-lg text-white font-extrabold w-1/3 text-right">DELETE</span>
 			</li>
-			{pokemons.map(pokemon => (
+			{list.map(pokemon => (
 				<li class="flex items-center justify-between border-b border-gray-300 p-2">
 					<span class="text-lg text-red-600 font-bold w-1/3">{pokemon.id}</span>
 					<span class="text-lg text-red-600 font-bold w-1/3 text-center">{pokemon.name}</span>
