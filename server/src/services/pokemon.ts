@@ -14,6 +14,14 @@ const pokemonList: Pokemon[] = [
   { id: 9, name: 'Blastoise' },
 ]
 
+export const findPokemonById = async (id: number) => {
+  return pokemonList.find(p => p.id === id)
+}
+
+export const findPokemonByName = async (name: string) => {
+  return pokemonList.find(p => p.name === name)
+}
+
 export const getPokemonList = async (page?: number): Promise<{ list: Pokemon[], count: number}> => {
   if (!page) { return { list: pokemonList, count: pokemonList.length } }
   return { list: pokemonList.slice((page - 1) * 5, page * 5), count: pokemonList.length }

@@ -52,6 +52,7 @@ import { addPokemon, getPokemonList } from "../../../services/pokemon"
 
 export const GET: APIRoute = async (context) => {
   const page = parseInt(context.url.searchParams.get('page') ?? '1', 10)
+
   return new Response(JSON.stringify(await getPokemonList(page)), {
     headers: {
       'content-type': 'application/json',

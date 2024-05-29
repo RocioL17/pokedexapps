@@ -14,12 +14,19 @@ export default function App() {
   const pageCount = Math.ceil(count / 5)
 
   useEffect(() => {
+    let cancelled = false
     fetch(`${BASE_URL}/pokemon.json?page=${page}`)
       .then((res) => res.json())
       .then((data) => {
-        setList(data.list)
-        setCount(data.count)
+        if (!cancelled) {
+          setList(data.list)
+          setCount(data.count)
+        }
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [page])
 
   async function addPokemon(event: React.FormEvent<HTMLFormElement>) {

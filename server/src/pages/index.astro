@@ -1,34 +1,85 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { getPokemonList } from '../services/pokemon';
+import { invalidInput, nameTooLong, nameTooShort, pokemonAlreadyExists } from "../helpers/errors";
+import Layout from "../layouts/Layout.astro";
+import { getPokemonList } from "../services/pokemon";
 
-const { list } = await getPokemonList()
+const { list } = await getPokemonList();
+const error = Astro.cookies.get("error")?.value;
+
+const body = Astro.cookies.get('body')?.json()
+const nameError = error === nameTooLong || error === nameTooShort
 ---
 
 <Layout title="Pokedex">
 	<main class="container mx-auto flex flex-col">
 		<h1 class="text-5xl text-red-600 font-extrabold text-center">Pokedex</h1>
 		<form action="/api/pokemon" method="post">
+			{
+				(error === invalidInput || error === pokemonAlreadyExists) && (
+					<div class="bg-red-400/70 p-4 rounded my-2 text-white text-xl">
+						Error: {error}
+					</div>
+				)
+			}
 			<h2 class="text-2xl text-red-700 font-bold">Agregar nuevo pokemon</h2>
-			<input type="number" name="id" placeholder="ID" class="my-1 w-full p-2 border border-gray-300 rounded-lg" />
-			<input type="text" name="name" placeholder="Name" class="my-1 w-full p-2 border border-gray-300 rounded-lg" />
-			<button type="submit" class="w-full p-2 bg-red-600 text-white rounded-lg mt-2 font-bold uppercase duration-200 hover:bg-red-700">Agregar</button>
+			<input
+				type="number"
+				name="id"
+				placeholder="ID"
+				value={body?.id ?? ""}
+				class="my-1 w-full p-2 border border-gray-300 rounded-lg"
+			/>
+			<div>
+				<input
+					type="text"
+					name="name"
+					placeholder="Name"
+					value={body?.name ?? ""}
+					class={`my-1 w-full p-2 border border-gray-300 rounded-lg ${
+						nameError ? 'border-red-600' : ''
+					}`}
+				/>
+				{nameError && <label class="text-red-600">{error}</label>}
+			</div>
+			<button
+				type="submit"
+				class="w-full p-2 bg-red-600 text-white rounded-lg mt-2 font-bold uppercase duration-200 hover:bg-red-700"
+				>Agregar</button
+			>
 		</form>
 		<ul class="mt-4 border-4 border-red-700">
-			<li class="flex items-center justify-between border-b border-gray-300 p-2 bg-red-700">
+			<li
+				class="flex items-center justify-between border-b border-gray-300 p-2 bg-red-700"
+			>
 				<span class="text-lg text-white font-extrabold w-1/3">ID</span>
-				<span class="text-lg text-white font-extrabold w-1/3 text-center">Name</span>
-				<span class="text-lg text-white font-extrabold w-1/3 text-right">DELETE</span>
+				<span class="text-lg text-white font-extrabold w-1/3 text-center"
+					>Name</span
+				>
+				<span class="text-lg text-white font-extrabold w-1/3 text-right"
+					>DELETE</span
+				>
 			</li>
-			{list.map(pokemon => (
-				<li class="flex items-center justify-between border-b border-gray-300 p-2">
-					<span class="text-lg text-red-600 font-bold w-1/3">{pokemon.id}</span>
-					<span class="text-lg text-red-600 font-bold w-1/3 text-center">{pokemon.name}</span>
-					<form action={`/api/pokemon/${pokemon.id}`} method="post" class="w-1/3 text-right">
-						<button type="submit" class="font-bold hover:font-extrabold">X</button>	
-					</form>
-				</li>
-			))}
+			{
+				list.map((pokemon) => (
+					<li class="flex items-center justify-between border-b border-gray-300 p-2">
+						<span class="text-lg text-red-600 font-bold w-1/3">
+							{pokemon.id}
+						</span>
+						<span class="text-lg text-red-600 font-bold w-1/3 text-center">
+							{pokemon.name}
+						</span>
+						<form
+							action={`/api/pokemon/${pokemon.id}`}
+							method="post"
+							class="w-1/3 text-right"
+						>
+							<button type="submit" class="font-bold hover:font-extrabold">
+								X
+							</button>
+						</form>
+					</li>
+				))
+			}
 		</ul>
 	</main>
 </Layout>
